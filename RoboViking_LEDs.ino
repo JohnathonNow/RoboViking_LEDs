@@ -1,4 +1,5 @@
 #include "src/pit/leds.h"
+#include "src/util/mode.h"
 
 void setup() {
     Serial.begin(9600);
@@ -6,5 +7,5 @@ void setup() {
 }
 
 void loop() {
-    step(0);
+    step(mode());
 }
