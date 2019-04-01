@@ -8,7 +8,7 @@
 #define MAX        (128)
 #define BRIGHTNESS (100)
 
-namespace robot {
+namespace cart {
     void start();
     void step(uint8_t mode);
 }

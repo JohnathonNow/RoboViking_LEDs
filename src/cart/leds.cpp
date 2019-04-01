@@ -4,6 +4,10 @@
 
 static Adafruit_NeoPixel_ZeroDMA strip(NUMPIXELS, PIN, NEO_GRB);
 
+static bool is_front_cart(uint32_t i) {
+    return i > 188 && i < 255;
+}
+
 static int set(uint32_t i, int r, int g, int b) {
     if (i >= 0 && i < NUMPIXELS) {
         strip.setPixelColor(i, cap(r), cap(g), cap(b));
@@ -14,7 +18,7 @@ static void rv(uint32_t tim, uint32_t sp) {
     for (uint32_t i = 0; i < NUMPIXELS; i++) {
         float r = triangle_wave(tim*sp*5/4  + i + 0) * MAX;
         float g = triangle_wave(tim*sp  + i + 32) * MAX;
-        if (i > 188 && i < 255) {
+        if (is_front_cart(i)) {
             r /= 2;
             g /= 2;
         }
@@ -27,8 +31,8 @@ static void rb(uint32_t tim) {
         float r = triangle_wave(tim + i) * (float)MAX;
         float g = triangle_wave(tim + i + 25) * (float)MAX;
         float b = triangle_wave(tim + i + 50) * (float)MAX;
-        if (i > 160 && i < 255) {
-            set(i, r/3, g/3, b/3);
+        if (is_front_cart(i)) {
+            set(i, r/2, g/2, b/2);
         } else {
             set(i, r, g, b);
         }
@@ -52,36 +56,15 @@ static void usa(uint32_t tim) {
     delay(20);
 }
 
-static void climb(uint32_t time) {
-    for (uint32_t i = 0; i < NUMPIXELS; i++) {
-        uint32_t r = MAX;
-        uint32_t g = MAX;
-        uint32_t b = 0;
-        if ((time/10 + i) % 6 < 3){
-            r = 0;
-        }
-        set(i, r, g, b);
-    }
-};
-
-void robot::start() {
+void cart::start() {
     strip.begin();
     strip.setBrightness(cap(BRIGHTNESS*255/100));
     strip.show();
 }
 
-void robot::step(uint8_t mode) {
+void cart::step(uint8_t mode) {
     static uint32_t time = 0;
-    switch (mode) {
-        case 0: rb(time); break;
-        case 1: rv(time, 1); break;
-        case 2: rv(time, 2); break;
-        case 3: rv(time, 3); break;
-        case 4: climb(time); break;
-        case 5: usa(time); break;
-        case 6: rb(time); break;
-        default: rb(time); break;
-    }
+    rv(time, 1);
     strip.show();
     time++;
 }
