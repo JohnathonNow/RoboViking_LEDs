@@ -2,7 +2,7 @@
 #include "src/robot/leds.h"
 #include "src/util/mode.h"
 
-using namespace robot;
+using namespace pit;
 
 void setup() {
     start();

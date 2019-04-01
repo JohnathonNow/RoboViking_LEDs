@@ -107,7 +107,7 @@ void robot::step(uint8_t mode) {
         default: rb(time); break;
     }
     */
-    case 0: rv(time, 1);break;
+    rv(time, 1);
     strip.show();
     time++;
 }
