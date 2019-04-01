@@ -1,8 +1,10 @@
 #include "src/pit/leds.h"
+#include "src/robot/leds.h"
 #include "src/util/mode.h"
 
+using namespace robot;
+
 void setup() {
-    Serial.begin(9600);
     start();
 }
 

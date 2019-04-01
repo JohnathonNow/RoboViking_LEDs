@@ -10,12 +10,18 @@ static int set(uint32_t i, int r, int g, int b) {
     }
 }
 
-static void rv(uint32_t tim) {
+#define NUMPIXELS 300
+#define MAX 128
+
+
+static void rv(uint32_t tim, uint32_t sp) {
     for (uint32_t i = 0; i < NUMPIXELS; i++) {
-        float light = triangle_wave(tim*4/5 + i) * (float)MAX;
-        light = 255;
-        float r = triangle_wave(tim*5/4  + i + 0) * light;
-        float g = triangle_wave(tim  + i + 32) * light;
+        float r = triangle_wave(tim*sp*5/4  + i + 0) * MAX;
+        float g = triangle_wave(tim*sp  + i + 32) * MAX;
+        if (i > 188 && i < 255) {
+            r /= 2;
+            g /= 2;
+        }
         set(i, r, r+g, 0);
     }
 }
@@ -25,9 +31,29 @@ static void rb(uint32_t tim) {
         float r = triangle_wave(tim + i) * (float)MAX;
         float g = triangle_wave(tim + i + 25) * (float)MAX;
         float b = triangle_wave(tim + i + 50) * (float)MAX;
-        set(i, r, g, b);
+        if (i > 160 && i < 255) {
+            set(i, r/3, g/3, b/3);
+        } else {
+            set(i, r, g, b);
+        }
     }
-    set(tim%NUMPIXELS, 255, 0, 0);
+}
+
+static void ti(uint32_t tim) {
+    for (uint32_t i = 0; i < NUMPIXELS; i++) {
+        int t = (tim * 6 + i) % 540;
+        if (t < 180) {
+            int r = sind(t) * 255;
+            set(i, 0, 0, r);
+        } else if (t < 360) {
+            int w = sind(t - 180) * 220;
+            set(i, w, w, w);
+        } else {
+            int b = sind(t - 360) * 255;
+            set(i, 0, 0, b);
+        }
+    }
+    delay(20);
 }
 
 static void usa(uint32_t tim) {
@@ -37,7 +63,7 @@ static void usa(uint32_t tim) {
             int r = sind(t) * 255;
             set(i, r, 0, 0);
         } else if (t < 360) {
-            int w = sind(t - 180) * 255;
+            int w = sind(t - 180) * 220;
             set(i, w, w, w);
         } else {
             int b = sind(t - 360) * 255;
@@ -46,27 +72,43 @@ static void usa(uint32_t tim) {
     }
     delay(20);
 }
+
 static void climb(uint32_t time) {
     for (uint32_t i = 0; i < NUMPIXELS; i++) {
-        uint32_t r = 128;
-        uint32_t g = 128;
+        uint32_t r = MAX;
+        uint32_t g = MAX;
         uint32_t b = 0;
         if ((time/10 + i) % 6 < 3){
+            b = MAX;
             r = 0;
+            g = 0;
         }
         set(i, r, g, b);
     }
 };
 
-void pit::start() {
+void robot::start() {
     strip.begin();
     strip.setBrightness(cap(BRIGHTNESS*255/100));
     strip.show();
 }
 
-void pit::step(uint8_t mode) {
+void robot::step(uint8_t mode) {
     static uint32_t time = 0;
-    rv(time);
+    /*
+    switch (mode) {
+        case 0: rb(time); break;
+        case 1: rv(time, 1); break;
+        case 2: rv(time, 2); break;
+        case 3: rv(time, 3); break;
+        case 4: climb(time); break;
+        case 5: usa(time); break;
+        case 6: rb(time); break;
+        default: rb(time); break;
+    }
+    */
+    case 0: rv(time, 1);break;
     strip.show();
     time++;
 }
+
