@@ -51,8 +51,8 @@ static void mich(uint32_t tim) {
     for (uint32_t i = 0; i < NUMPIXELS; i++) {
         int t = (tim * 6 + i) % 540;
         if (t < 270) {
-            int r = sind(t) * 255;
-            set(i, r, 0, 0);
+            int b = sind(t) * 255;
+            set(i, 0, 0, b);
         } else {
             int rg = sind(t - 270) * 255;
             set(i, rg, rg, 0);
